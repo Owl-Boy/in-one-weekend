@@ -1,3 +1,9 @@
+mod vec3;
+mod color;
+
+use vec3::Color;
+use color::write_color;
+
 const IMAGE_WIDTH: u16 = 256;
 const IMAGE_HEIGHT: u16 = 256;
 
@@ -9,12 +15,8 @@ fn main() {
             let r = (i as f32)/((IMAGE_WIDTH - 1) as f32);
             let g = (j as f32)/((IMAGE_HEIGHT - 1) as f32);
             let b = 0.25;
-
-            let ir = (255.999 * r) as u16;
-            let ig = (255.999 * g) as u16;
-            let ib = (255.999 * b) as u16;
-
-            println!("{ir} {ig} {ib}");
+            let pixel_color = Color::new(r, g, b);
+            write_color(pixel_color);
         }
     }
 }
