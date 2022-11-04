@@ -29,6 +29,10 @@ impl Vec3 {
     pub fn normalize(&mut self) {
         *self /= self.len();
     }
+    
+    pub fn unit_along(&self) -> Self {
+        *self / self.len()
+    }
 
     pub fn len_squared(self) -> f32 {
         Self::dot(self, self)
