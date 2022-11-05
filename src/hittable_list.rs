@@ -1,12 +1,12 @@
-use crate::{hittable::{Hittable, Hit_Record}, ray::Ray};
+use crate::{hittable::{Hittable, HitRecord}, ray::Ray};
 
-pub struct Hittable_List<T: Hittable> {
+pub struct HittableList<T: Hittable> {
     pub ls: Vec<T>,
 }
 
-impl<T: Hittable> Hittable_List<T> {
+impl<T: Hittable> HittableList<T> {
     pub fn new(ls: Vec<T>) -> Self {
-        Hittable_List { ls }
+        HittableList { ls }
     }
 
     pub fn clear(&mut self) {
@@ -18,10 +18,10 @@ impl<T: Hittable> Hittable_List<T> {
     }
 }
 
-impl<T: Hittable> Hittable for Hittable_List<T> {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit_Record> {
+impl<T: Hittable> Hittable for HittableList<T> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
-        let mut rec: Option<Hit_Record> = None;
+        let mut rec: Option<HitRecord> = None;
         for obj in self.ls.iter() {
             match obj.hit(r, t_min, closest_so_far) {
                 None => {},

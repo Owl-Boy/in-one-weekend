@@ -1,4 +1,4 @@
-use crate::{vec3::{Point, Vec3}, hittable::{Hittable, Hit_Record}, ray::Ray};
+use crate::{vec3::{Point, Vec3}, hittable::{Hittable, HitRecord}, ray::Ray};
 
 #[derive(Debug)]
 pub struct Sphere {
@@ -13,7 +13,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<Hit_Record> {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.dir.len_squared();
         let half_b = Vec3::dot(oc, r.dir);
@@ -30,12 +30,12 @@ impl Hittable for Sphere {
                  } else {
                      let p = r.point_at(t);
                      let normal = (p - self.center) / self.radius;
-                     Some(Hit_Record { t, p, normal})
+                     Some(HitRecord { t, p, normal})
                  }
             } else {
                  let p = r.point_at(t);
                  let normal = (p - self.center) / self.radius;
-                 Some(Hit_Record { t, p, normal})
+                 Some(HitRecord { t, p, normal})
             }
         } else {
             None
