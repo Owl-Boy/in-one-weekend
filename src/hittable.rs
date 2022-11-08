@@ -1,12 +1,12 @@
-use crate::{ray::Ray, vec3::{Point, Vec3}};
+use crate::{ray::Ray, vec3::{Point, Vec3}, material::Material};
 
-#[derive(Debug)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub p: Point,
     pub normal: Vec3,
     pub t: f32,
+    pub mat: &'a dyn Material,
 }
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> { None }
+    fn hit(&self, _r: &Ray, _t_min: f32, _t_max: f32) -> Option<HitRecord> { None }
 }

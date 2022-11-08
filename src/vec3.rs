@@ -1,4 +1,7 @@
+#![allow(dead_code)]
+
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Neg};
+use rand::{prelude::*, distributions::{Distribution, Uniform}};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
@@ -10,6 +13,43 @@ pub struct Vec3 {
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Vec3 {x, y, z}
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let x: f32 = rng.gen();
+        let y: f32 = rng.gen();
+        let z: f32 = rng.gen();
+        Vec3 { x, y, z }
+    }
+    
+    pub fn rand_range(min: f32, max: f32) -> Self {
+        let between = Uniform::new(min, max);
+        let mut rng = rand::thread_rng();
+        let x: f32 = between.sample(&mut rng);
+        let y: f32 = between.sample(&mut rng);
+        let z: f32 = between.sample(&mut rng);
+        Vec3 { x, y, z }
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Vec3::rand_range(-1.0, 1.0);
+            if p.len_squared() < 1.0 { return p; }
+        }
+    }
+
+    pub fn random_in_hemisphere(normal: &Vec3) -> Self {
+        let v = Self::random_in_unit_sphere();
+        if Self::dot(v, *normal) > 0.0 {
+            v
+        } else {
+            -v
+        }
+    }
+
+    pub fn random_unit_vector() -> Self {
+        Self::random_in_unit_sphere().unit_along()
     }
 
     pub fn dot(v1: Vec3, v2: Vec3) -> f32 {
@@ -39,6 +79,27 @@ impl Vec3 {
     pub fn len(self) -> f32 {
         self.len_squared().sqrt()
     } 
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
+    }
+
+    pub fn reflect(v: Vec3, n: Vec3) -> Self {
+        v - n*2.0*Self::dot(v, n)
+    }
+
+    pub fn refract(v: Vec3, n: Vec3, index: f32) -> Option<Self> {
+        let uv = v.unit_along();
+        let dt = Vec3::dot(uv, n);
+        let disc = 1.0 - index.powi(2) * (1.0 - dt.powi(2));
+        if disc > 0.0 {
+            let refracted = (uv - n * dt) * index - n * disc.sqrt();
+            Some(refracted)
+        } else {
+            None
+        }
+    }
 }
 
 impl Add for Vec3 {
@@ -89,6 +150,18 @@ impl Mul<f32> for Vec3 {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs,
+        }
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Self;
+
+    fn mul(self, rhs: Vec3) -> Self {
+        Self {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
         }
     }
 }
