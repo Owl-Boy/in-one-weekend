@@ -1,34 +1,32 @@
-#![allow(dead_code)]
-
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Neg};
 use rand::{prelude::*, distributions::{Distribution, Uniform}};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3 {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vec3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vec3 {x, y, z}
     }
 
     pub fn random() -> Self {
         let mut rng = rand::thread_rng();
-        let x: f32 = rng.gen();
-        let y: f32 = rng.gen();
-        let z: f32 = rng.gen();
+        let x: f64 = rng.gen();
+        let y: f64 = rng.gen();
+        let z: f64 = rng.gen();
         Vec3 { x, y, z }
     }
     
-    pub fn rand_range(min: f32, max: f32) -> Self {
+    pub fn rand_range(min: f64, max: f64) -> Self {
         let between = Uniform::new(min, max);
         let mut rng = rand::thread_rng();
-        let x: f32 = between.sample(&mut rng);
-        let y: f32 = between.sample(&mut rng);
-        let z: f32 = between.sample(&mut rng);
+        let x: f64 = between.sample(&mut rng);
+        let y: f64 = between.sample(&mut rng);
+        let z: f64 = between.sample(&mut rng);
         Vec3 { x, y, z }
     }
 
@@ -52,7 +50,18 @@ impl Vec3 {
         Self::random_in_unit_sphere().unit_along()
     }
 
-    pub fn dot(v1: Vec3, v2: Vec3) -> f32 {
+    pub fn rand_in_unit_disk() -> Self {
+        let mut rng = thread_rng();
+        let unit = Vec3::new(1.0, 1.0, 0.0);
+        loop {
+            let p = Vec3::new(rng.gen::<f64>(), rng.gen::<f64>(), 0.0) * 2.0 - unit;
+            if p.len_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    pub fn dot(v1: Vec3, v2: Vec3) -> f64 {
         v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
     }
 
@@ -72,11 +81,11 @@ impl Vec3 {
         *self / self.len()
     }
 
-    pub fn len_squared(self) -> f32 {
+    pub fn len_squared(self) -> f64 {
         Self::dot(self, self)
     }
 
-    pub fn len(self) -> f32 {
+    pub fn len(self) -> f64 {
         self.len_squared().sqrt()
     } 
 
@@ -89,7 +98,7 @@ impl Vec3 {
         v - n*2.0*Self::dot(v, n)
     }
 
-    pub fn refract(v: Vec3, n: Vec3, index: f32) -> Option<Self> {
+    pub fn refract(v: Vec3, n: Vec3, index: f64) -> Option<Self> {
         let uv = v.unit_along();
         let dt = Vec3::dot(uv, n);
         let disc = 1.0 - index.powi(2) * (1.0 - dt.powi(2));
@@ -142,10 +151,10 @@ impl SubAssign for Vec3 {
     }
 }
 
-impl Mul<f32> for Vec3 {
+impl Mul<f64> for Vec3 {
     type Output = Self;
 
-    fn mul(self, rhs: f32) -> Self {
+    fn mul(self, rhs: f64) -> Self {
         Self {
             x: self.x * rhs,
             y: self.y * rhs,
@@ -166,18 +175,18 @@ impl Mul<Vec3> for Vec3 {
     }
 }
 
-impl MulAssign<f32> for Vec3 {
-    fn mul_assign(&mut self, rhs: f32) {
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, rhs: f64) {
         self.x *= rhs;
         self.y *= rhs;
         self.z *= rhs
     }
 }
 
-impl Div<f32> for Vec3 {
+impl Div<f64> for Vec3 {
     type Output = Self;
 
-    fn div(self, rhs: f32) -> Self {
+    fn div(self, rhs: f64) -> Self {
         Self {
             x: self.x / rhs,
             y: self.y / rhs,
@@ -186,8 +195,8 @@ impl Div<f32> for Vec3 {
     }
 }
 
-impl DivAssign<f32> for Vec3 {
-    fn div_assign(&mut self, rhs: f32) {
+impl DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, rhs: f64) {
         self.x /= rhs;
         self.y /= rhs;
         self.z /= rhs

@@ -3,18 +3,18 @@ use crate::{vec3::{Point, Vec3}, hittable::{Hittable, HitRecord}, ray::Ray, mate
 #[derive(Debug)]
 pub struct Sphere<M: Material> {
     pub center: Point,
-    pub radius: f32,
+    pub radius: f64,
     pub mat: M,
 }
 
 impl<T:Material> Sphere<T> {
-    pub fn new(center: Point, radius: f32, mat: T) -> Self {
+    pub fn new(center: Point, radius: f64, mat: T) -> Self {
         Sphere {center, radius, mat}
     }
 }
 
 impl<M: Material> Hittable for Sphere<M> {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = r.dir.len_squared();
         let half_b = Vec3::dot(oc, r.dir);
