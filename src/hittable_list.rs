@@ -1,11 +1,12 @@
 use crate::{hittable::{Hittable, HitRecord}, ray::Ray};
+use std::sync::Arc;
 
 pub struct HittableList {
-    pub ls: Vec<Box<dyn Hittable>>,
+    pub ls: Vec<Box<dyn Hittable + Send>>,
 }
 
 impl HittableList {
-    pub fn new(ls: Vec<Box<dyn Hittable>>) -> Self { HittableList { ls }}
+    pub fn new(ls: Vec<Box<dyn Hittable + Send>>) -> Self { HittableList { ls }}
 }
 
 impl Hittable for HittableList {
@@ -22,5 +23,11 @@ impl Hittable for HittableList {
             };
         }
         rec
+    }
+}
+
+impl Hittable for Arc<HittableList> {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        HittableList::hit(&self, r, t_min, t_max)
     }
 }

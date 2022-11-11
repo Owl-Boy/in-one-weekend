@@ -7,6 +7,6 @@ pub struct HitRecord<'a> {
     pub mat: &'a dyn Material,
 }
 
-pub trait Hittable {
+pub trait Hittable : Sync {
     fn hit(&self, _r: &Ray, _t_min: f64, _t_max: f64) -> Option<HitRecord> { None }
 }

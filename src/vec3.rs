@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Neg};
 use rand::{prelude::*, distributions::{Distribution, Uniform}};
 

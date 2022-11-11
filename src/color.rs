@@ -10,7 +10,7 @@ fn clamp(x: f64, min: f64, max: f64) -> f64 {
     }
 }
 
-pub fn write_color(pixel_color: Color, sample_per_pixel: u16) {
+pub fn write_color(pixel_color: Color, sample_per_pixel: u64) {
     let r = pixel_color.x;
     let g = pixel_color.y;
     let b = pixel_color.z;
@@ -21,9 +21,9 @@ pub fn write_color(pixel_color: Color, sample_per_pixel: u16) {
     let g = (scale * g).sqrt();
     let b = (scale * b).sqrt();
 
-    let ir = (256 as f64 * clamp(r, 0.0, 0.999)) as u16;
-    let ig = (256 as f64 * clamp(g, 0.0, 0.999)) as u16;
-    let ib = (256 as f64 * clamp(b, 0.0, 0.999)) as u16;
+    let ir = (256 as f64 * clamp(r, 0.0, 0.999)) as u8;
+    let ig = (256 as f64 * clamp(g, 0.0, 0.999)) as u8;
+    let ib = (256 as f64 * clamp(b, 0.0, 0.999)) as u8;
 
     println!("{ir} {ig} {ib}");
 }
