@@ -6,7 +6,7 @@ pub trait Material : Sync {
 }
 
 #[derive(Debug)]
-pub struct Lambertian {
+pub struct Lambertian { // Matte
     pub albedo: Color,
 }
 
@@ -18,6 +18,7 @@ impl Lambertian {
 
 impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)> {
+        // the relfected ray is normal + random deviation
         let mut scatter_direction = rec.normal + Vec3::random_unit_vector();
         if scatter_direction.near_zero() {
             scatter_direction = rec.normal;
@@ -29,7 +30,7 @@ impl Material for Lambertian {
 }
 
 #[derive(Debug)]
-pub struct Metal {
+pub struct Metal { // Reflective
     albedo: Color,
     fuzz: f64,
 }
@@ -43,6 +44,7 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)> {
+        // reflection is along the idea relfected ray + some random deviation based on fuzziness
         let reflected = Vec3::reflect(r_in.dir.unit_along(), rec.normal);
         let scattered = Ray::new(rec.p, reflected + Vec3::random_in_unit_sphere() * self.fuzz);
         if Vec3::dot(scattered.dir, rec.normal) > 0.0 {
@@ -54,7 +56,7 @@ impl Material for Metal {
 }
 
 #[derive(Debug)]
-pub struct Dielectric {
+pub struct Dielectric { // Transparent
     pub ref_idx: f64,
 }
 
@@ -66,6 +68,7 @@ impl Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Ray, Color)> {
+        // refracts or reflects ideally
         let attenuation = Color::new(1.0, 1.0, 1.0);
         let (outward_normal, ni_by_nt) = if Vec3::dot(r_in.dir, rec.normal) > 0.0 {
             (-rec.normal, self.ref_idx)
@@ -75,11 +78,11 @@ impl Material for Dielectric {
     
         let cos_theta = f64::min(Vec3::dot(-r_in.dir.unit_along(), outward_normal), 1.0);
         let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
-        let cannot_refract = ni_by_nt * sin_theta > 1.0;
+        let tir_occurs = ni_by_nt * sin_theta > 1.0;
         let mut rng = thread_rng();
         let val: f64 = rng.gen();
 
-        let direction = if cannot_refract || reflectance(cos_theta, ni_by_nt) > val {
+        let direction = if tir_occurs || reflectance(cos_theta, ni_by_nt) > val {
             Vec3::reflect(r_in.dir.unit_along(), outward_normal)
         } else {
             match Vec3::refract(r_in.dir.unit_along(), outward_normal, ni_by_nt) {
@@ -94,6 +97,7 @@ impl Material for Dielectric {
 }
 
 fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    // Schlick's approximation for calculate the amount of light reflected vs refracted
     let r0 = ((1.0 - ref_idx) / (1.0 + ref_idx)).powi(2);
     r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
 }

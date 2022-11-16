@@ -11,6 +11,7 @@ impl HittableList {
 
 impl Hittable for HittableList {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        // Returns the Hit record for the closest hit
         let mut closest_so_far = t_max;
         let mut rec: Option<HitRecord> = None;
         for obj in self.ls.iter() {
