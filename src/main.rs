@@ -20,6 +20,7 @@ use rand::prelude::*;
 use std::sync::Arc;
 use std::thread;
 use std::sync::mpsc;
+use indicatif::ProgressBar;
 
 // Image
 const ASPECT_RATIO: f64 = 1.5;
@@ -100,6 +101,7 @@ fn main() {
 
     // Render
     println!("P3\n{IMAGE_WIDTH} {IMAGE_HEIGHT}\n255");
+    let pb = Arc::new(ProgressBar::new((IMAGE_HEIGHT * IMAGE_WIDTH) as u64));
 
     let mut recievers = Vec::with_capacity(IMAGE_HEIGHT as usize);
     for j in (0..IMAGE_HEIGHT).rev() {
@@ -108,6 +110,7 @@ fn main() {
             let (tx, rx) = mpsc::channel();
             let cam1 = cam.clone();
             let world1 = aworld.clone();
+            let indic1 = pb.clone();
             thread::spawn(move || {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..SAMPLES_PER_PIXEL {
@@ -120,6 +123,7 @@ fn main() {
                     pixel_color += ray_color(&r, &world1, MAX_DEPTH);
                 }
                 tx.send(pixel_color).unwrap();
+                indic1.inc(1);
             });
             row.push(rx);
         }
@@ -132,4 +136,5 @@ fn main() {
             write_color(pixel_color, SAMPLES_PER_PIXEL as u64);
         }
     }
+    pb.finish_with_message("Done!");
 }
